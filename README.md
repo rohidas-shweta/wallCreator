@@ -17,3 +17,6 @@ View from the front.
 4. To get the top view again you can check the setView checkbox from the menu.
 5. To insert the walls again select the create_points checkbox and plot the points to create the wall.
 
+
+6.  After the wall is created the API in the backend will get called that will insert the wall dimensions (width, height, depth) in the database table.
+
