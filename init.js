@@ -5,7 +5,7 @@ import { GUI } from 'dat.gui';
 class CubeCreator {
     constructor() {
         this.scene = new THREE.Scene();
-        this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -500, 1500);
+        this.camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -1000, 1500);
         this.renderer = new THREE.WebGLRenderer();
         this.controls = null;
         this.savedCameraPosition = null;
@@ -31,11 +31,11 @@ class CubeCreator {
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         var settings = {
             message: "dat.GUI",
-            checkbox : false,
+            create_points: false,
             setView: false
         }
         const createWall = this.gui.addFolder('Create Wall');
-        this.gui.add(settings, 'checkbox').onChange((value) => {
+        this.gui.add(settings, 'create_points').onChange((value) => {
             this.createEntity = value;
             this.controls.enabled = !value;
         });
@@ -52,8 +52,6 @@ class CubeCreator {
         
         window.addEventListener('resize', this.onWindowResize.bind(this), true);
         this.renderer.domElement.addEventListener('click',this.createPoints.bind(this), true);
-
-
         document.addEventListener("DOMContentLoaded", this.animate.bind(this));
     }
 
@@ -73,7 +71,6 @@ class CubeCreator {
             if(this.count == 0){
                 this.posArray = []
             }
-            console.log("posArray", this.posArray);
             let geometry = new THREE.SphereGeometry(2,30,30);
             let material = new THREE.MeshBasicMaterial({color:'#44585b'});
             let mesh = new THREE.Mesh(geometry, material);
@@ -82,10 +79,7 @@ class CubeCreator {
             let point1 = new THREE.Vector3().copy(mesh.position);
             this.posArray.push(point1);
             this.count++;
-            console.log(this.count);
-            console.log(this.posArray);
             if(this.count == 2){
-                console.log("create cube")
                 let pointsArray = this.posArray
                 this.posArray = [];
                 this.createCube(pointsArray)
@@ -111,9 +105,9 @@ class CubeCreator {
         wall.applyQuaternion(rotation);
 
         this.scene.add(wall);
-        let wireframeGeometry = new THREE.EdgesGeometry(geometry); // Create edges geometry
-        let wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.5 }); // Set transparent material
-        let wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial); // Create wireframe mesh
+        let wireframeGeometry = new THREE.EdgesGeometry(geometry);
+        let wireframeMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, opacity: 0.5 });
+        let wireframe = new THREE.LineSegments(wireframeGeometry, wireframeMaterial)
         wall.add(wireframe); 
         
         this.camera.rotation.y += Math.PI/2;
@@ -133,7 +127,7 @@ class CubeCreator {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        render();
+        this.render();
     }
 
     animate() {
@@ -146,7 +140,7 @@ class CubeCreator {
         this.controls.update();
     }
     addToDatabase(params) {
-        fetch('http://localhost:5000/insert', {
+        fetch('http://localhost:5001/insert', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
